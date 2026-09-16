@@ -6,6 +6,13 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const LAW_OC = process.env.LAW_OC || "";
 
 const app = express();
+
+// 모든 들어오는 요청을 로그로 남겨, 요청이 실제로 서버까지 도달하는지 확인
+app.use((req, _res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.url} (host: ${req.headers.host})`);
+  next();
+});
+
 app.use(express.json());
 
 app.post("/mcp", async (req, res) => {
@@ -48,6 +55,12 @@ app.get("/mcp", (_req, res) => {
 
 app.get("/", (_req, res) => {
   res.send("law-mcp is running. MCP 엔드포인트는 POST /mcp 입니다.");
+});
+
+// 진단용: 매칭되지 않은 모든 경로를 명시적으로 기록
+app.use((req, res) => {
+  console.log(`[UNMATCHED] ${req.method} ${req.url}`);
+  res.status(404).json({ error: "not found", path: req.url, method: req.method });
 });
 
 app.listen(PORT, () => {
