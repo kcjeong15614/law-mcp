@@ -30,8 +30,15 @@ async function callLawApi(path: "lawSearch.do" | "lawService.do", oc: string, pa
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
       Accept: "application/json, text/plain, */*",
+      // 법제처 서버가 브라우저에서 온 요청인지(Referer 존재 여부)를 참고할 수 있어,
+      // 서버 대 서버(fetch) 호출에도 동일한 값을 명시적으로 채워 넣는다.
+      Referer: "https://www.law.go.kr/",
+      Origin: "https://www.law.go.kr",
     },
   });
+
+  // 진단용: law.go.kr에서 실제로 어떤 응답이 돌아왔는지 상태코드와 함께 기록
+  console.log(`[LAW_API] ${path} -> HTTP ${res.status} (url: ${url})`);
 
   if (!res.ok) {
     throw new Error(`법령정보 API 호출 실패: HTTP ${res.status} (요청 URL: ${url})`);
