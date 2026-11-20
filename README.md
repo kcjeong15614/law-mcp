@@ -10,10 +10,17 @@ Node.js/Express 기반 원격 MCP 서버입니다. **Render**에 배포하도록
 거치면 법제처 서버가 파라미터를 제대로 읽지 못하는 오류를 계속 돌려주는 문제가 있었습니다.
 Render는 고정된 클라우드 VM에서 Node.js 프로세스를 상시 실행하는 방식이라 이 문제를 피할 수 있습니다.
 
-제공 도구 6개는 이전과 동일합니다:
+제공 도구는 11개입니다:
 - `search_law` / `get_law_detail` — 법령 검색 / 본문(조문·부칙·별표) 조회
+- `get_law_as_of` — 특정 날짜(사건일·과세기간 등) 당시 시행 중이던 버전의 조문 조회, 이후 개정 목록 포함
 - `search_admin_rule` / `get_admin_rule_detail` — 행정규칙(훈령·예규·고시 등) 검색 / 본문 조회
 - `search_precedent` / `get_precedent_detail` — 판례 검색 / 판시사항·판결요지·전문 조회
+- `search_decisions` / `get_decision_detail` — 법령해석례·헌법재판소 결정례·행정심판 재결례·조세심판원 재결례 검색 / 본문 조회 (`domain`으로 분야 선택)
+- `search_ordinance` / `get_ordinance_detail` — 자치법규(조례·규칙) 검색 / 본문 조회
+
+그 밖에:
+- 조문 번호는 `제38조`, `제3조의2`처럼 써도 됩니다 (6자리 `003800` 형식도 그대로 동작)
+- 같은 조회는 메모리 캐시로 다시 씁니다 (검색 1시간, 본문 24시간, 서버가 잠들면 비워짐)
 
 ---
 
@@ -62,7 +69,7 @@ https://law-mcp-glzf.onrender.com/mcp
 1. Claude.ai 접속 → 설정(Settings) → 커넥터(Connectors)
 2. "커스텀 커넥터 추가" 또는 "Add custom connector"
 3. 위에서 확인한 `/mcp`로 끝나는 URL을 입력
-4. 저장 후 대화에서 커넥터를 켜면 6개 도구를 바로 사용할 수 있습니다
+4. 저장 후 대화에서 커넥터를 켜면 11개 도구를 바로 사용할 수 있습니다
 
 ## 4. 국가법령정보센터에 도메인 재등록
 
@@ -102,7 +109,16 @@ GitHub 저장소에 커밋·푸시만 하면 Render가 자동으로 감지해서
 ## 참고: 사용한 국가법령정보 Open API 스펙
 
 - 법령 목록/본문: `target=law`
+- 시행일 기준 법령(연혁 목록·과거 버전 본문): `target=eflaw`
 - 행정규칙 목록/본문: `target=admrul`
 - 판례 목록/본문: `target=prec`
+- 법령해석례: `target=expc` / 헌재 결정례: `target=detc` / 행정심판: `target=decc` / 조세심판원: `target=ttSpecialDecc`
+- 자치법규: `target=ordin`
+
+새 분야(해석례·헌재·행정심판·조세심판·자치법규)는 open.law.go.kr의 OPEN API 신청 내역에 해당 API가 포함되어 있어야 합니다.
 
 전체 파라미터 안내는 https://open.law.go.kr/LSO/openApi/guideList.do 에서 확인 가능합니다.
+
+## 참고한 프로젝트
+
+해석례·결정례·자치법규 조회와 시행일 기준 연혁 조회 방식은 [korean-law-mcp](https://github.com/chrisryugj/korean-law-mcp) (MIT License, Copyright (c) 2025 Chris)의 법제처 API 사용 방식을 참고해 다시 구현했습니다.
