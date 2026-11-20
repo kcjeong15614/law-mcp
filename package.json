@@ -1,5 +1,5 @@
 {
-  "name": "law-mcp-render",
+  "name": "law-mcp",
   "version": "1.0.0",
   "description": "국가법령정보 MCP 서버 (Render 배포용)",
   "type": "module",
